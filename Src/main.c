@@ -21,6 +21,12 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+//Joshua's Includes
+#include "stm32f0xx_hal_def.h"
+#include "stm32f0xx_hal_gpio.h"
+#include <stdio.h>
+#include <stdlib.h>
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -55,19 +61,63 @@ static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_I2C1_Init(void);
 /* USER CODE BEGIN PFP */
-
+volatile int16_t button_data;
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+/*Button Push*/
+void
+Button_Push_Init()
+{
+  // Enable GPIO Peripheral clock
 
+
+  GPIO_InitTypeDef GPIO_InitStructure;
+
+  // Configure pin in output push/pull mode, for the button
+  GPIO_InitStructure.Pin = GPIO_PIN_9 ;
+  GPIO_InitStructure.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStructure.Speed =GPIO_SPEED_FREQ_HIGH ;
+  GPIO_InitStructure.Pull = GPIO_PULLUP   ;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+  //Configure pin in output push/pull mode, for the LED
+  GPIO_InitStructure.Pin = GPIO_PIN_5;
+  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStructure.Speed =GPIO_SPEED_FREQ_HIGH ;
+  GPIO_InitStructure.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStructure);
+
+}
+void
+Button_Push(){
+	if(HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_9) == 1 ){
+		  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_5,GPIO_PIN_SET);
+		  button_data = 1;
+	  }else{
+		  button_data = 0;
+	  }
+	Timer(500);
+}
+/*Timer*/
+void
+Timer(int A){
+	int I;
+	while(I < A*1000){
+		I++;
+	}
+}
 /* USER CODE END 0 */
 
 /**
   * @brief  The application entry point.
   * @retval int
   */
-int main(void)
+
+
+int
+main(void)
 {
   /* USER CODE BEGIN 1 */
 
@@ -78,7 +128,6 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -94,6 +143,10 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   MX_I2C1_Init();
+
+  //Joshua code
+  Button_Push_Init();
+
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -103,6 +156,9 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+
+	//Button Test
+	Button_Push();
 
     /* USER CODE BEGIN 3 */
   }
